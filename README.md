@@ -30,6 +30,8 @@ properly.  If you'd like to make the app scalable, you'll need to:
    commit those changes to the Git repo
 3. Use a background task to copy file contents from gear to gear
 
+All of the scripts used to deploy and configure Drupal are located in
+the [build](.openshift/action_hooks/build) and [deploy](.openshift/action_hooks/deploy) hooks.
 
 Using Drush
 -----------
