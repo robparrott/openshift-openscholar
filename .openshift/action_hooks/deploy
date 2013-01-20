@@ -12,6 +12,12 @@ DRUPAL_SETTINGS=${DRUPAL_SITE_DIR}/default/settings.php
 DRUSH_SCRIPT=${OPENSHIFT_DATA_DIR}bin/drush
 DEFAULT_PASSWORD=openshift_changeme
 
+if [ ! -d "${DRUPAL_SITE_DIR}/default" ]
+then
+  echo "No sites directory has been created, Drupal cannot be deployed"
+  exit 9
+fi
+
 #
 # Create a new Drupal site.  You can delete your ${OPENSHIFT_DATA_DIR}sites
 # folder to run this step again.

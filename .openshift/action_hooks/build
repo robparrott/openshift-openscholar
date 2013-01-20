@@ -60,17 +60,6 @@ else
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
 fi
 
-#
-# OpenShift looks for PHP files inside of app-root/runtime/repo/php
-# This runs on every build to ensure that the link is present (since
-# repo is recreated)
-#
-if ! ln -s $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
-then
-  echo "ERROR: Unable to link the PHP directory"
-  exit 8
-fi
-
 echo
 
 #
@@ -81,4 +70,15 @@ if [ ! -d "$DRUPAL_SITE_DIR" ]
 then
   cp -r $DRUPAL_INSTALL_DIR/sites.original $DRUPAL_SITE_DIR
   ln -s $DRUPAL_SITE_DIR $DRUPAL_INSTALL_DIR/sites
+fi
+
+#
+# OpenShift looks for PHP files inside of app-root/runtime/repo/php
+# This runs on every build to ensure that the link is present (since
+# repo is recreated)
+#
+if ! ln -s $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
+then
+  echo "ERROR: Unable to link the PHP directory, Drupal cannot be used if the php directory already exists in your Git repository."
+  exit 8
 fi
