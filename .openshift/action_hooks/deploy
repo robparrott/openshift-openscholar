@@ -1,0 +1,133 @@
+#!/bin/bash
+# This deploy hook gets executed after dependencies are resolved and the
+# build hook has been run but before the application has been started back
+# up again.  This script gets executed directly, so it could be python, php,
+# ruby, etc.
+
+set -e
+
+DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR}sites
+DRUPAL_PRIVATE_DIR=${OPENSHIFT_DATA_DIR}private
+DRUPAL_SETTINGS=${DRUPAL_SITE_DIR}/default/settings.php
+DRUSH_SCRIPT=${OPENSHIFT_DATA_DIR}versions/bin/drush
+DEFAULT_PASSWORD=openshift_changeme
+
+#
+# Create a new Drupal site.  You can delete your ${OPENSHIFT_DATA_DIR}sites
+# folder to run this step again.
+#
+if [ ! -f "${DRUPAL_SITE_DIR}/default/settings.php" ]
+then
+
+  #
+  # Automatic installation only works with mysql.
+  # 
+  if [ -z "$OPENSHIFT_MYSQL_DB_HOST" ]
+  then
+      echo 1>&2
+      echo "Could not find mysql database. Please run:" 1>&2
+      echo "rhc app cartridge add mysql -a $OPENSHIFT_APP_NAME" 1>&2
+      echo "then make a sample commit (add whitespace somewhere) and re-push" 1>&2
+      echo 1>&2
+  fi
+
+  RETRY=60
+  while [ $RETRY -gt 0 ] ; do
+      #reload env variables
+      for env_var in  $OPENSHIFT_HOMEDIR/.env/*
+      do
+          . $env_var
+      done
+
+      #check for db
+      if [ -n "$OPENSHIFT_MYSQL_DB_HOST" ]
+      then
+          echo "Database server found at $OPENSHIFT_MYSQL_DB_HOST. initializing..."
+          sleep 5
+          break
+      fi
+
+      sleep 1
+      RETRY=$(( $RETRY - 1 ))
+  done
+  if [ -z "$OPENSHIFT_MYSQL_DB_HOST" ]
+  then
+      exit 5
+  fi
+  if [ -z "$OPENSHIFT_MYSQL_DB_PORT" ]
+  then
+      exit 6
+  fi
+
+  mkdir -p ${DRUPAL_SITE_DIR}/default
+  mkdir -p ${DRUPAL_PRIVATE_DIR}
+
+  pushd ${OPENSHIFT_REPO_DIR}php
+  echo
+  echo "Creating a new Drupal site at ${DRUPAL_SITE_DIR}/default"
+  echo
+  if ! $DRUSH_SCRIPT site-install standard --site-name=${OPENSHIFT_APP_NAME} --account-pass=openshift_changeme --db-url=mysql://$OPENSHIFT_MYSQL_DB_USERNAME:$OPENSHIFT_MYSQL_DB_PASSWORD@$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/$OPENSHIFT_APP_NAME --yes
+  then
+    echo "Unable to configure your Drupal installation"
+    echo
+    exit 10
+  fi
+
+  #
+  # Tweak settings.php to use the OpenShift environment variables instead of
+  # the values passed to Drush.
+  #
+  chmod u+w ${DRUPAL_SETTINGS} ${DRUPAL_SITE_DIR}/default
+  cat ${DRUPAL_SETTINGS} | ruby -e "puts STDIN.read.gsub(/\\\$databases\s*=\s*array.*?\)\;/m, '# Replaced by OpenShift')" > ${OPENSHIFT_TMP_DIR}/settings.php
+  cat << "END" >> ${OPENSHIFT_TMP_DIR}/settings.php
+
+/**
+ * For maximum portability, use the OpenShift environment variables.
+ */
+
+// When run from Drush, only $_ENV is available.  Might be a bug
+if (array_key_exists('OPENSHIFT_APP_NAME', $_SERVER)) {
+  $src = $_SERVER;
+} else {
+  $src = $_ENV;
+}
+$databases = array (
+  'default' => 
+  array (
+    'default' => 
+    array (
+      'database' => $src['OPENSHIFT_APP_NAME'],
+      'username' => $src['OPENSHIFT_MYSQL_DB_USERNAME'],
+      'password' => $src['OPENSHIFT_MYSQL_DB_PASSWORD'],
+      'host' => $src['OPENSHIFT_MYSQL_DB_HOST'],
+      'port' => $src['OPENSHIFT_MYSQL_DB_PORT'],
+      'driver' => 'mysql',
+      'prefix' => '',
+    ),
+  ),
+);
+END
+  cat ${OPENSHIFT_TMP_DIR}/settings.php > ${DRUPAL_SETTINGS}
+
+  #
+  # Use the temporary directories that OpenShift provides, and set
+  # the private path to be inside the data dir
+  #
+  echo "\$conf['file_private_path'] = \$src['OPENSHIFT_DATA_DIR'] . 'private/';" >> ${DRUPAL_SETTINGS}
+  echo "\$conf['file_temporary_path'] = \$src['OPENSHIFT_TMP_DIR'] . 'drupal/';" >> ${DRUPAL_SETTINGS}
+
+  chmod u-w ${DRUPAL_SETTINGS} ${DRUPAL_SITE_DIR}/default
+
+  popd
+  echo
+  echo "Drupal is now configured"
+  echo
+  echo "===================================================="
+  echo "  Drupal-Admin login: admin"
+  echo "  Drupal-Admin password: openshift_changeme"
+  echo "  Don't forget to change your drupal admin password!"
+  echo "===================================================="
+else
+  echo "Drupal is already configured.  Delete settings.php to rerun setup"
+fi
+echo

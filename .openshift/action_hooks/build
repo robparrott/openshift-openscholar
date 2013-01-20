@@ -1,0 +1,84 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc. 
+
+set -e
+
+#
+# The PHP dir most be controlled by Drupal content
+#
+if [ -e "${OPENSHIFT_REPO_DIR}php" ]
+then
+  echo "ERROR: The 'php' directory in your Git repo prevents Drupal from being installed.  Please remove 'php' and push again."
+  exit 5
+fi
+
+DRUPAL_DIR=${OPENSHIFT_DATA_DIR}drupal
+DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR}sites
+
+echo
+
+#
+# If there is no current download of Drupal, create one.
+#
+if [ ! -d "${OPENSHIFT_DATA_DIR}downloads/current" ]
+then
+  mkdir -p ${OPENSHIFT_DATA_DIR}bin
+  export DRUSH_SCRIPT=`find $OPENSHIFT_HOMEDIR -type f -name drush 2>/dev/null | head -1`
+  ln -s $DRUSH_SCRIPT ${OPENSHIFT_DATA_DIR}bin/drush
+  mkdir -p ${OPENSHIFT_TMP_DIR}drupal
+
+  # Add Drush to the .bash_profile, which you must manually source in the shell
+  echo "PATH=\${OPENSHIFT_DATA_DIR}bin:\$PATH" >> ${OPENSHIFT_DATA_DIR}.bash_profile
+  echo "Run '. \${OPENSHIFT_DATA_DIR}.bash_profile' to load Drush into your SSH shell."
+  echo
+
+  echo "Download and install the latest stable version of Drupal"
+  echo
+
+  if ! $DRUSH_SCRIPT dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  then
+    echo "ERROR: Unable download and install Drupal."
+    exit 7
+  fi
+  export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/`ls -1rt ${OPENSHIFT_DATA_DIR}downloads | head -1`"
+  ln -s ${DRUPAL_INSTALL_DIR} ${OPENSHIFT_DATA_DIR}downloads/current
+
+  mv $DRUPAL_INSTALL_DIR/sites $DRUPAL_INSTALL_DIR/sites.original
+
+  #
+  # Ensure there is a default health check
+  #
+  cp ${OPENSHIFT_REPO_DIR}.openshift/health_check.php ${DRUPAL_INSTALL_DIR}
+
+
+  echo "Drupal installed to $DRUPAL_INSTALL_DIR"
+else
+  DRUPAL_INSTALL_DIR=`readlink -f ${OPENSHIFT_DATA_DIR}downloads/current`
+  echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
+fi
+
+#
+# OpenShift looks for PHP files inside of app-root/runtime/repo/php
+# This runs on every build to ensure that the link is present (since
+# repo is recreated)
+#
+if ! ln -s $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
+then
+  echo "ERROR: Unable to link the PHP directory"
+  exit 8
+fi
+
+echo
+
+#
+# Link the /sites directory (where Drupal stores modules and files)
+# into the install dir in order to keep it easily accessible.
+#
+if [ ! -d "$DRUPAL_SITE_DIR" ]
+then
+  cp -r $DRUPAL_INSTALL_DIR/sites.original $DRUPAL_SITE_DIR
+  ln -s $DRUPAL_SITE_DIR $DRUPAL_INSTALL_DIR/sites
+fi
