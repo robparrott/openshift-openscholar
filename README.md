@@ -87,14 +87,13 @@ Repo layout
 -----------
 
 php/ - At deploy time, the build script will symlink this directory to a
-directory containing Drupal
-../data - For persistent data
+directory containing Drupal  
+../data - For persistent data  
 ../data/sites - The data for your Drupal site, including settings.php,
-downloaded modules, and uploaded files
-../data/downloads - The most recent version of Drupal.
-deplist.txt - list of pears to install
-.openshift/action_hooks/build - Script that gets run every push, just prior to
-    starting your app
+downloaded modules, and uploaded files  
+../data/downloads - The most recent version of Drupal.  
+deplist.txt - list of pears to install  
+.openshift/action_hooks/build - Script that gets run every push, just prior to starting your app  
 
 
 Notes about layout
