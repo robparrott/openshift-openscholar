@@ -55,17 +55,7 @@ Create an account at http://openshift.redhat.com/
 
 Create a php-5.3 application with MySQL and Cron support.
 
-    rhc app create drupal php-5.3 mysql cron
-
-Add this upstream drupal repo
-
-    cd drupal
-    git remote add upstream -m master git://github.com/openshift/drupal-example.git
-    git pull -s recursive -X theirs upstream master
-
-Then push the repo upstream
-
-    git push
+    rhc app create drupal php-5.3 mysql cron --from-code=git://github.com/openshift/drupal-quickstart.git
 
 That's it, you can now checkout your application at:
     http://drupal-$yournamespace.rhcloud.com
