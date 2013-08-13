@@ -9,14 +9,15 @@ set -e
 #
 # The PHP dir most be controlled by Drupal content
 #
-if [ -e "${OPENSHIFT_REPO_DIR}php" ]
+if [ -e "${OPENSHIFT_REPO_DIR}php" -a ! -h "${OPENSHIFT_REPO_DIR}php" ]
 then
   echo "ERROR: The 'php' directory in your Git repo prevents Drupal from being installed.  Please remove 'php' and push again."
   exit 5
 fi
 
-DRUPAL_DIR=${OPENSHIFT_DATA_DIR}drupal
-DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR}sites
+OPENSHIFT_DATA_DIR_RELATIVE=$(echo ${OPENSHIFT_DATA_DIR} | sed "s|^${OPENSHIFT_HOMEDIR}|~/|g")
+DRUPAL_DIR=${OPENSHIFT_DATA_DIR_RELATIVE}drupal
+DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR_RELATIVE}sites
 
 echo
 
@@ -43,8 +44,8 @@ then
     echo "ERROR: Unable download and install Drupal."
     exit 7
   fi
-  export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/`ls -1rt ${OPENSHIFT_DATA_DIR}downloads | head -1`"
-  ln -s ${DRUPAL_INSTALL_DIR} ${OPENSHIFT_DATA_DIR}downloads/current
+  export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR_RELATIVE}downloads/$(ls -1rt ${OPENSHIFT_DATA_DIR}downloads | head -1)"
+  ln -sfn ${DRUPAL_INSTALL_DIR} ${OPENSHIFT_DATA_DIR}downloads/current
 
   mv $DRUPAL_INSTALL_DIR/sites $DRUPAL_INSTALL_DIR/sites.original
 
@@ -56,7 +57,7 @@ then
 
   echo "Drupal installed to $DRUPAL_INSTALL_DIR"
 else
-  DRUPAL_INSTALL_DIR=`readlink -f ${OPENSHIFT_DATA_DIR}downloads/current`
+  DRUPAL_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/current | sed "s|^${OPENSHIFT_HOMEDIR}|~/|g")
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
 fi
 
@@ -77,7 +78,7 @@ fi
 # This runs on every build to ensure that the link is present (since
 # repo is recreated)
 #
-if ! ln -s $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
+if ! ln -sfn $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
 then
   echo "ERROR: Unable to link the PHP directory, Drupal cannot be used if the php directory already exists in your Git repository."
   exit 8
