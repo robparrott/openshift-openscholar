@@ -9,7 +9,7 @@ set -e
 #
 # The PHP dir most be controlled by Drupal content
 #
-if [ -e "${OPENSHIFT_REPO_DIR}php" ]
+if [ -e "${OPENSHIFT_REPO_DIR}php" -a ! -h "${OPENSHIFT_REPO_DIR}php" ]
 then
   echo "ERROR: The 'php' directory in your Git repo prevents Drupal from being installed.  Please remove 'php' and push again."
   exit 5
@@ -38,13 +38,20 @@ then
   echo "Download and install the latest stable version of Drupal"
   echo
 
+  mkdir -p ${OPENSHIFT_DATA_DIR}downloads
   if ! $DRUSH_SCRIPT dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
   then
     echo "ERROR: Unable download and install Drupal."
     exit 7
   fi
-  export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/`ls -1rt ${OPENSHIFT_DATA_DIR}downloads | head -1`"
-  ln -s ${DRUPAL_INSTALL_DIR} ${OPENSHIFT_DATA_DIR}downloads/current
+
+  #
+  # Link the /current symlink to the latest Drupal instance
+  #
+  rm -f ${OPENSHIFT_DATA_DIR}downloads/current
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | head -1)
+  export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
+  ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/current
 
   mv $DRUPAL_INSTALL_DIR/sites $DRUPAL_INSTALL_DIR/sites.original
 
@@ -56,7 +63,7 @@ then
 
   echo "Drupal installed to $DRUPAL_INSTALL_DIR"
 else
-  DRUPAL_INSTALL_DIR=`readlink -f ${OPENSHIFT_DATA_DIR}downloads/current`
+  DRUPAL_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/current)
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
 fi
 
@@ -65,20 +72,20 @@ echo
 #
 # Link the /sites directory (where Drupal stores modules and files)
 # into the install dir in order to keep it easily accessible.
-#
+#/
 if [ ! -d "$DRUPAL_SITE_DIR" ]
 then
   cp -r $DRUPAL_INSTALL_DIR/sites.original $DRUPAL_SITE_DIR
-  ln -s $DRUPAL_SITE_DIR $DRUPAL_INSTALL_DIR/sites
+  ln -sfn ../../sites $DRUPAL_INSTALL_DIR/sites
 fi
 
 #
-# OpenShift looks for PHP files inside of app-root/runtime/repo/php
-# This runs on every build to ensure that the link is present (since
-# repo is recreated)
+# Ensure that the app-root/runtime/repo/php PHP directory points
+# to a valid Drupal instance directory
 #
-if ! ln -s $DRUPAL_INSTALL_DIR ${OPENSHIFT_REPO_DIR}php
-then
-  echo "ERROR: Unable to link the PHP directory, Drupal cannot be used if the php directory already exists in your Git repository."
+ln -sfn ../../data/downloads/current ${OPENSHIFT_REPO_DIR}php
+if [ ! -d "${OPENSHIFT_REPO_DIR}php" ]
+then  
+  echo "ERROR: Unable to link the PHP directory, as the current Drupal instance is not a valid directory."
   exit 8
 fi
