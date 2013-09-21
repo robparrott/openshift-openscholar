@@ -45,7 +45,14 @@ and then running
     cd ${OPENSHIFT_REPO_DIR}php
     drush --help
 
-Drush has many helpful commands for managing your installation.
+Drush has many helpful commands for managing your installation, such as:
+
+    drush dl <project>	# Download module/theme
+    drush en <project>	# Enable module/theme
+    drush dis <project>	# Disable module/theme
+    drush cc all	# Clear all cache
+    drush core-cron     # Run cron
+    drush updb		# Apply database updates
 
 
 Running on OpenShift
