@@ -25,21 +25,13 @@ echo
 #
 if [ ! -d "${OPENSHIFT_DATA_DIR}downloads/current" ]
 then
-  mkdir -p ${OPENSHIFT_DATA_DIR}bin
-  export DRUSH_SCRIPT=`find $OPENSHIFT_HOMEDIR -type f -name drush 2>/dev/null | head -1`
-  ln -s $DRUSH_SCRIPT ${OPENSHIFT_DATA_DIR}bin/drush
   mkdir -p ${OPENSHIFT_TMP_DIR}drupal
-
-  # Add Drush to the .bash_profile, which you must manually source in the shell
-  echo "PATH=\${OPENSHIFT_DATA_DIR}bin:\$PATH" >> ${OPENSHIFT_DATA_DIR}.bash_profile
-  echo "Run '. \${OPENSHIFT_DATA_DIR}.bash_profile' to load Drush into your SSH shell."
-  echo
 
   echo "Download and install the latest stable version of Drupal"
   echo
 
   mkdir -p ${OPENSHIFT_DATA_DIR}downloads
-  if ! $DRUSH_SCRIPT dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  if ! drush dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
   then
     echo "ERROR: Unable download and install Drupal."
     exit 7

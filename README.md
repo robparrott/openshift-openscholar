@@ -36,11 +36,9 @@ the [build](.openshift/action_hooks/build) and [deploy](.openshift/action_hooks/
 Using Drush
 -----------
 
-The Drush management tool for Drupal is automatically installed - you can add it to your path when you SSH in to the application by using the following command:
-
-    . ${OPENSHIFT_DATA_DIR}.bash_profile
-
-and then running
+The Drush management tool for Drupal is automatically installed during
+the [build](.openshift/action_hooks/build) hook. You may want to run
+the Drush commands within the Drupal root directory:
 
     cd ${OPENSHIFT_REPO_DIR}php
     drush --help
