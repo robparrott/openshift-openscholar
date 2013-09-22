@@ -20,6 +20,13 @@ DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR}sites
 
 echo
 
+# Drush settings
+cat >$OPENSHIFT_HOMEDIR/.drush/drushrc.php <<EOF
+<?php
+  \$options['uri'] = \$_ENV['OPENSHIFT_APP_DNS'];
+  \$options['root'] = \$_ENV['OPENSHIFT_REPO_DIR'].'php';
+EOF
+
 #
 # If there is no current download of Drupal, create one.
 #
