@@ -44,12 +44,13 @@ and you can simply use it while ssh'd into your gear.
 
 Drush has many helpful commands for managing your installation, such as:
 
+    drush st			# Show status of Drush and the Drupal site
     drush dl <project>	# Download module/theme
     drush en <project>	# Enable module/theme
     drush dis <project>	# Disable module/theme
-    drush cc all	# Clear all cache
+    drush cc all		# Clear all cache
     drush core-cron     # Run cron
-    drush updb		# Apply database updates
+    drush updb			# Apply database updates
 
 
 Running on OpenShift
