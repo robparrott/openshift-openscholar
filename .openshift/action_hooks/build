@@ -37,12 +37,16 @@ then
   echo "Download and install the latest stable version of Drupal"
   echo
 
-  mkdir -p ${OPENSHIFT_DATA_DIR}downloads
-  if ! drush dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  #mkdir -p ${OPENSHIFT_DATA_DIR}downloads
+  mkdir -p ${OPENSHIFT_DATA_DIR}downloads/drupal
+  #if ! drush dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  pushd ${OPENSHIFT_DATA_DIR}downloads/drupal > /dev/null
+  if ! drush make ${OPENSHIFT_REPO_DIR}/drupal-org-core.make --yes
   then
     echo "ERROR: Unable download and install Drupal."
     exit 7
   fi
+  popd > /dev/null
 
   #
   # Link the /current symlink to the latest Drupal instance
