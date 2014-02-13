@@ -1,5 +1,7 @@
-Drupal on OpenShift
+OpenScholar on OpenShift
 ===================
+
+_This is based on the drupal-quickstart repo and the README is not modified from that yet._
 
 This Git repository helps you get up and running quickly w/ a Drupal
 installation on OpenShift. It defaults to using MySQL, so when creating

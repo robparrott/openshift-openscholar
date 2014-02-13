@@ -6,6 +6,8 @@
 
 set -e
 
+OPENSCHOLAR_RELEASE=3.11.1
+
 #
 # The PHP dir most be controlled by Drupal content
 #
@@ -48,7 +50,7 @@ then
   # Link the /current symlink to the latest Drupal instance
   #
   rm -f ${OPENSHIFT_DATA_DIR}downloads/current
-  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | head -1)
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads/*drupal* | head -1)
   export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/current
 
@@ -67,6 +69,84 @@ else
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
 fi
 
+#
+# Download & Install OpenScholar
+# 
+
+if [ ! -d "${OPENSHIFT_DATA_DIR}downloads/openscholar-current" ]
+then
+  
+  mkdir -p ${OPENSHIFT_TMP_DIR}openscholar
+
+  echo "Download and install the latest stable version of OpenScholar"
+  echo
+
+  mkdir -p ${OPENSHIFT_DATA_DIR}downloads
+  TGZ=SCHOLAR-${OPENSCHOLAR_RELEASE}.tar.gz
+  
+  if ! [ -r ${OPENSHIFT_DATA_DIR}downloads/${TGZ} ]; then
+   (
+    cd ${OPENSHIFT_DATA_DIR}downloads
+    rm -f ${TGZ}
+    curl https://github.com/openscholar/openscholar/archive/${TGZ} > ./${TGZ}
+    tar xzvf ${TGZ}
+    cd -
+   )
+  fi
+  
+  #
+  # Link the /openscholar-current symlink to the latest copy of the code 
+  #
+  rm -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads/*SCHOLAR* | head -1)
+  export OPENSCHOLAR_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
+  ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
+
+
+  #
+  # Build the OpenScholar profile
+  #
+  (
+    cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
+    drush make --no-core --contrib-destination drupal-org.make .
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install --prefer-source
+    cd ..
+  )
+
+  # Copy unmakable contrib files
+  (
+    cp -R ${OPENSCHOLAR_INSTALL_DIR}/temporary/* ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/contrib/
+  )
+
+  # iCalcreator cannot be downloaded via make because a temporary token is needed,
+  # so we have the library inside os_events directory and we copy it to libraries.
+  (
+    cp -R ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/os_features/os_events/iCalcreator/ ${OPENSCHOLAR_INSTALL_DIR}/openscholar/libraries/
+  )
+
+  # Build the ops profile
+  (
+    OPS_DIR=${OPENSHIFT_DATA_DIR}/ops
+    [ -d ${OPS_DIR} ] || mkdir -p ${OPS_DIR}
+    cd ${OPS_DIR}
+    drush make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
+    cd -
+  )
+
+  #
+  # Add it into the drupal profiles
+  #
+  ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
+
+  echo "OpenScholar installed to $DRUPAL_INSTALL_DIR"
+
+  )
+else
+  OPENSCHOLAR_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current)
+  echo "OpenScholar is already installed at $OPENSCHOLAR_INSTALL_DIR"
+fi
+
 echo
 
 #
@@ -78,6 +158,7 @@ then
   cp -r $DRUPAL_INSTALL_DIR/sites.original $DRUPAL_SITE_DIR
   ln -sfn ../../sites $DRUPAL_INSTALL_DIR/sites
 fi
+
 
 #
 # Ensure that the app-root/runtime/repo/php PHP directory points
