@@ -141,7 +141,6 @@ then
 
   echo "OpenScholar installed to $DRUPAL_INSTALL_DIR"
 
-  )
 else
   OPENSCHOLAR_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current)
   echo "OpenScholar is already installed at $OPENSCHOLAR_INSTALL_DIR"
