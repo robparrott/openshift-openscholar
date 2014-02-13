@@ -6,6 +6,8 @@
 
 set -e
 
+env 
+
 OPENSCHOLAR_RELEASE=3.11.1
 
 #
