@@ -8,6 +8,8 @@ set -e
 
 env 
 
+alias drush $OPENSHIFT_DEPENDENCIES_DIR/drush/drush 
+
 OPENSCHOLAR_RELEASE=3.11.1
 
 #
