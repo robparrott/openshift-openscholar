@@ -120,55 +120,43 @@ else
 fi
 
 
-  #
-  # Build the OpenScholar profile
-  #
-  (
-    echo "Building OpenScholar ..."
-    cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
+#
+# Build the OpenScholar profile
+#
+(
+  echo "Building OpenScholar ..."
+  cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
 
-    if ! [ -r ./libraries/hopscotch ]; then
-      ${DRUSH} make --no-core --contrib-destination drupal-org.make .
-    fi
+  if ! [ -r ./libraries/hopscotch ]; then
+    ${DRUSH} make --no-core --contrib-destination drupal-org.make .
+  fi
 
-    curl -s https://getcomposer.org/installer | php
-    php composer.phar install --prefer-source
+  curl -s https://getcomposer.org/installer | php
+  php composer.phar install --prefer-source
 
-    cd ..
-  )
-
-  echo
-  echo "OpenScholar successfully built in $OPENSCHOLAR_INSTALL_DIR"
-  echo 
-
-  # Copy unmakable contrib files
-  (
-    cp -R ${OPENSCHOLAR_INSTALL_DIR}/temporary/* ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/contrib/
-  )
-
-  # iCalcreator cannot be downloaded via make because a temporary token is needed,
-  # so we have the library inside os_events directory and we copy it to libraries.
-  (
-    cp -R ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/os_features/os_events/iCalcreator/ ${OPENSCHOLAR_INSTALL_DIR}/openscholar/libraries/
-  )
-
-  # Build the ops profile
-  #(
-  #  OPS_DIR=${OPENSHIFT_DATA_DIR}/ops
-  #  [ -d ${OPS_DIR} ] || mkdir -p ${OPS_DIR}
-  #  cd ${OPS_DIR}
-  #  ${DRUSH} make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
-  #  cd -
-  #)
-
-  #
-  # Add it into the drupal profiles
-  #
-  ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
-
-
+  cd ..
+)
 
 echo
+echo "OpenScholar successfully built in $OPENSCHOLAR_INSTALL_DIR"
+echo 
+
+# Copy unmakable contrib files
+(
+  cp -R ${OPENSCHOLAR_INSTALL_DIR}/temporary/* ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/contrib/
+)
+
+# iCalcreator cannot be downloaded via make because a temporary token is needed,
+# so we have the library inside os_events directory and we copy it to libraries.
+(
+  cp -R ${OPENSCHOLAR_INSTALL_DIR}/openscholar/modules/os_features/os_events/iCalcreator/ ${OPENSCHOLAR_INSTALL_DIR}/openscholar/libraries/
+)
+
+#
+# Add it into the drupal profiles
+#
+ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
+
 
 #
 # Link the /sites directory (where Drupal stores modules and files)
