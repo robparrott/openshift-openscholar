@@ -70,6 +70,8 @@ then
 
   patch ${DRUPAL_INSTALL_DIR}/.htaccess < ${OPENSHIFT_REPO_DIR}.openshift/.htaccess.patch
   echo "php_value memory_limit 256M" >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
+  echo "php_flag apc.cache_by_default Off" >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
+
 
   echo "Drupal installed to $DRUPAL_INSTALL_DIR"
   echo
