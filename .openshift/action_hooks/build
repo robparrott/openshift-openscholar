@@ -155,7 +155,7 @@ echo
 #
 # Add it into the drupal profiles
 #
-ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
+ln -sf ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
 
 
 #
