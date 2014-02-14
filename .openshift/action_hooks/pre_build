@@ -22,21 +22,21 @@ DRUSH_URL=https://github.com/drush-ops/drush/archive/6.2.0.tar.gz
 
 [ -d $OPENSHIFT_DATA_DIR/downloads ] || mkdir $OPENSHIFT_DATA_DIR/downloads
 
-# if [ -z $(which drush 2>/dev/null ) ]; then
-#   if ! [ -r $OPENSHIFT_DATA_DIR/downloads/drush.tgz ]; then
-#   	pushd  $OPENSHIFT_DATA_DIR/downloads
-#     wget ${DRUSH_URL} -O drush.tgz
-#     popd
-#   fi
-#   pushd $OPENSHIFT_DATA_DIR/downloads
-#   tar xzvf $OPENSHIFT_DATA_DIR/downloads/drush.tgz 
-#   DRUSH_DIR=$( ls -1td drush* | grep -v tgz | head -1 )
+if [ -z $(which drush 2>/dev/null ) ]; then
+   if ! [ -r $OPENSHIFT_DATA_DIR/downloads/drush.tgz ]; then
+   	pushd  $OPENSHIFT_DATA_DIR/downloads
+     wget ${DRUSH_URL} -O drush.tgz
+     popd
+   fi
+   pushd $OPENSHIFT_DATA_DIR/downloads
+   tar xzvf $OPENSHIFT_DATA_DIR/downloads/drush.tgz 
+   DRUSH_DIR=$( ls -1td drush* | grep -v tgz | head -1 )
   
-#   pushd ${OPENSHIFT_DATA_DIR}bin
-#   ln -s $OPENSHIFT_DATA_DIR/downloads/$DRUSH_DIR/drush .
-#   popd 
-#   popd
-# fi
+   pushd ${OPENSHIFT_DATA_DIR}bin
+   ln -s $OPENSHIFT_DATA_DIR/downloads/$DRUSH_DIR/drush .
+   popd 
+   popd
+fi
 
 
 #
