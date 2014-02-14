@@ -109,6 +109,12 @@ $databases = array (
     ),
   ),
 );
+
+/**
+ *  Up the memory limit 
+ */
+ini_set('memory_limit','256M');
+
 END
   cat ${OPENSHIFT_TMP_DIR}/settings.php > ${DRUPAL_SETTINGS}
 
