@@ -11,6 +11,7 @@ echo "Drupal application credentials\n\tuser: admin\n\tpassword: openshift_chang
 #
 mkdir -p ${OPENSHIFT_DATA_DIR}bin
 echo "PATH=\$PATH:${OPENSHIFT_DATA_DIR}bin" >> ${OPENSHIFT_DATA_DIR}/.bash_profile
+echo "export PATH"
 
 #
 # Install drush outside of pear for now.
