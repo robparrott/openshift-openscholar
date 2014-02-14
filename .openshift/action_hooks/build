@@ -6,11 +6,11 @@
 
 set -e
 
-env 
-
-DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
-
+# Choose version of OPenScholar to install
 OPENSCHOLAR_RELEASE=3.11.1
+
+# Explicitly point to a drush installation
+DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 
 #
 # The PHP dir most be controlled by Drupal content
@@ -54,9 +54,11 @@ then
   # Link the /current symlink to the latest Drupal instance
   #
   rm -f ${OPENSHIFT_DATA_DIR}downloads/current
-  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads/*drupal* | head -1)
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep drupal | head -1)
   export DRUPAL_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/current
+
+  ls $DRUPAL_INSTALL_DIR
 
   mv $DRUPAL_INSTALL_DIR/sites $DRUPAL_INSTALL_DIR/sites.original
 
@@ -104,7 +106,7 @@ then
   # Link the /openscholar-current symlink to the latest copy of the code 
   #
   rm -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
-  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads/*SCHOLAR* | head -1)
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep SCHOLAR | head -1)
   export OPENSCHOLAR_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
 
