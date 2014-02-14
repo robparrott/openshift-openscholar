@@ -8,7 +8,7 @@ set -e
 
 env 
 
-alias drush $OPENSHIFT_DEPENDENCIES_DIR/drush/drush 
+DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 
 OPENSCHOLAR_RELEASE=3.11.1
 
@@ -44,7 +44,7 @@ then
   echo
 
   mkdir -p ${OPENSHIFT_DATA_DIR}downloads
-  if ! drush dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  if ! ${DRUSH} dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
   then
     echo "ERROR: Unable download and install Drupal."
     exit 7
@@ -114,7 +114,7 @@ then
   #
   (
     cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
-    drush make --no-core --contrib-destination drupal-org.make .
+    ${DRUSH} make --no-core --contrib-destination drupal-org.make .
     curl -s https://getcomposer.org/installer | php
     php composer.phar install --prefer-source
     cd ..
@@ -136,7 +136,7 @@ then
     OPS_DIR=${OPENSHIFT_DATA_DIR}/ops
     [ -d ${OPS_DIR} ] || mkdir -p ${OPS_DIR}
     cd ${OPS_DIR}
-    drush make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
+    ${DRUSH} make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
     cd -
   )
 
