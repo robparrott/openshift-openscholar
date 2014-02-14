@@ -114,6 +114,10 @@ then
 
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
 
+else
+  OPENSCHOLAR_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current)
+  echo "OpenScholar is already installed at $OPENSCHOLAR_INSTALL_DIR"
+fi
 
 
   #
@@ -156,10 +160,7 @@ then
   #
   ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
 
-else
-  OPENSCHOLAR_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current)
-  echo "OpenScholar is already installed at $OPENSCHOLAR_INSTALL_DIR"
-fi
+
 
 echo
 
