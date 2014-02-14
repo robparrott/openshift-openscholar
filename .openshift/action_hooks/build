@@ -132,8 +132,8 @@ fi
     fi
 
     curl -s https://getcomposer.org/installer | php
-    rm -f composer.lock
     php composer.phar install --prefer-source
+
     cd ..
   )
 
@@ -153,13 +153,13 @@ fi
   )
 
   # Build the ops profile
-  (
-    OPS_DIR=${OPENSHIFT_DATA_DIR}/ops
-    [ -d ${OPS_DIR} ] || mkdir -p ${OPS_DIR}
-    cd ${OPS_DIR}
-    ${DRUSH} make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
-    cd -
-  )
+  #(
+  #  OPS_DIR=${OPENSHIFT_DATA_DIR}/ops
+  #  [ -d ${OPS_DIR} ] || mkdir -p ${OPS_DIR}
+  #  cd ${OPS_DIR}
+  #  ${DRUSH} make --no-core --contrib-destination ${OPENSCHOLAR_INSTALL_DIR}/openscholar/os-ops.make .
+  #  cd -
+  #)
 
   #
   # Add it into the drupal profiles
