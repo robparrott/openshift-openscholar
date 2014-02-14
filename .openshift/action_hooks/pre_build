@@ -33,7 +33,7 @@ if [ -z $(which drush 2>/dev/null ) ]; then
    DRUSH_DIR=$( ls -1td drush* | grep -v tgz | head -1 )
   
    pushd ${OPENSHIFT_DATA_DIR}bin
-   ln -s $OPENSHIFT_DATA_DIR/downloads/$DRUSH_DIR/drush .
+   ln -sf $OPENSHIFT_DATA_DIR/downloads/$DRUSH_DIR/drush .
    popd 
    popd
 fi
