@@ -13,7 +13,7 @@ echo "Drupal application credentials\n\tuser: admin\n\tpassword: openshift_chang
 export PATH=${OPENSHIFT_DEPENDENCIES_DIR}/drush
 
 DRUSH_URL=https://github.com/drush-ops/drush/archive/6.2.0.tar.gz 
-if ! [ which drush ]; then
+if [ -z $(which drush) ]; then
   if ! [ -r $OPENSHIFT_DATA_DIR/downloads/drush.tgz ]; then
   	cd  $OPENSHIFT_DATA_DIR/downloads
     wget ${DRUSH_URL} -O drush.tgz
