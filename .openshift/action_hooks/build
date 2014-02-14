@@ -70,9 +70,11 @@ then
   patch ${DRUPAL_INSTALL_DIR}/.htaccess < ${OPENSHIFT_REPO_DIR}.openshift/.htaccess.patch
 
   echo "Drupal installed to $DRUPAL_INSTALL_DIR"
+  echo
 else
   DRUPAL_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/current)
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
+  echo
 fi
 
 
@@ -95,7 +97,7 @@ then
    (
     cd ${OPENSHIFT_DATA_DIR}downloads
     rm -f ${TGZ}
-    curl https://github.com/openscholar/openscholar/archive/${TGZ} > ./${TGZ}
+    wget https://github.com/openscholar/openscholar/archive/${TGZ} -O ${TGZ}
     tar xzvf ${TGZ}
     cd -
    )
