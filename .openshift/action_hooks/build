@@ -13,6 +13,8 @@ OPENSCHOLAR_RELEASE=3.11.1
 #DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 DRUSH=drush
 
+export PATH=${PATH}:${OPENSHIFT_DATA_DIR}bin
+
 #
 # The PHP dir most be controlled by Drupal content
 #
@@ -67,11 +69,6 @@ then
   # Ensure there is a default health check
   #
   cp ${OPENSHIFT_REPO_DIR}.openshift/health_check.php ${DRUPAL_INSTALL_DIR}
-
-  patch ${DRUPAL_INSTALL_DIR}/.htaccess < ${OPENSHIFT_REPO_DIR}.openshift/.htaccess.patch
-#  echo "php_value memory_limit 256M" >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
-#  echo "php_flag apc.cache_by_default Off" >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
-
 
   echo "Drupal installed to $DRUPAL_INSTALL_DIR"
   echo
