@@ -7,28 +7,41 @@
 echo "Drupal application credentials\n\tuser: admin\n\tpassword: openshift_changeme\n" > ${OPENSHIFT_DATA_DIR}/CREDENTIALS
 
 #
+# Make our own personal bin dir and add to PATH
+#
+mkdir -p ${OPENSHIFT_DATA_DIR}bin
+echo "PATH=\$PATH:${OPENSHIFT_DATA_DIR}bin" >> ${OPENSHIFT_DATA_DIR}/.bash_profile
+
+#
 # Install drush outside of pear for now.
 #
 
 DRUSH_URL=https://github.com/drush-ops/drush/archive/6.2.0.tar.gz 
 
-export PATH=$PATH:${OPENSHIFT_DEPENDENCIES_DIR}drush
-
 [ -d $OPENSHIFT_DATA_DIR/downloads ] || mkdir $OPENSHIFT_DATA_DIR/downloads
 
- if [ -z $(which drush 2>/dev/null ) ]; then
+if [ -z $(which drush 2>/dev/null ) ]; then
   if ! [ -r $OPENSHIFT_DATA_DIR/downloads/drush.tgz ]; then
-  	cd  $OPENSHIFT_DATA_DIR/downloads
+  	pushd  $OPENSHIFT_DATA_DIR/downloads
     wget ${DRUSH_URL} -O drush.tgz
-    cd -
+    popd
   fi
-  cd ${OPENSHIFT_DEPENDENCIES_DIR}
+  pushd $OPENSHIFT_DATA_DIR/downloads
   tar xzvf $OPENSHIFT_DATA_DIR/downloads/drush.tgz 
-  mv drush-* drush
-  cd -
-
-  export PATH=${OPENSHIFT_DEPENDENCIES_DIR}/drush
+  DRUSH_DIR=$( ls -1td drush* | grep -v tgz | head -1 )
+  
+  pushd ${OPENSHIFT_DATA_DIR}bin
+  ln -s $OPENSHIFT_DATA_DIR/downloads/$DRUSH_DIR/drush .
+  popd 
+  popd
 fi
 
+
+#
+# Install a tool to manage INI files
+#
+URL=https://raw2.github.com/pixelb/crudini/master/crudini
+curl $URL > ${OPENSHIFT_DATA_DIR}bin/crudini
+chmod +x ${OPENSHIFT_DATA_DIR}bin/crudini
 
 

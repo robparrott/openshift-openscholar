@@ -14,8 +14,17 @@ DEFAULT_PASSWORD=openshift_changeme
 DRUPAL_PROFILE=openscholar
 
 # Explicitly point to a drush installation
-DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
+DRUSH=drush #"${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 
+#
+# Configure memory settings in php.ini 
+#
+PHP_INI=${OPENSHIFT_PHP_DIR}/versions/shared/configuration/etc/php.ini
+crudini --set ${PHP_INI}  PHP memory_limit 256M
+
+#
+# Check for a sites dir
+#
 if [ ! -d "${DRUPAL_SITE_DIR}/default" ]
 then
   echo "No sites directory has been created, Drupal cannot be deployed"
