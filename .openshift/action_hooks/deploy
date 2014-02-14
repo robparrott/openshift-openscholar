@@ -6,7 +6,7 @@
 
 set -e
 
-export PATH=${PATH}:${OPENSHIFT_DATA_DIR}bin
+source  ${OPENSHIFT_DATA_DIR}/.bash_profile
 
 DRUPAL_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/current)
 DRUPAL_SITE_DIR=${OPENSHIFT_DATA_DIR}sites
@@ -15,9 +15,6 @@ DRUPAL_SETTINGS=${DRUPAL_SITE_DIR}/default/settings.php
 DEFAULT_PASSWORD=openshift_changeme
 
 DRUPAL_PROFILE=openscholar
-
-# Explicitly point to a drush installation
-DRUSH=drush #"${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 
 #
 # Configure memory settings in php.ini 
@@ -78,7 +75,7 @@ then
   echo "Creating a new Drupal site at ${DRUPAL_SITE_DIR}/default"
   echo
   DB_URL="mysql://$OPENSHIFT_MYSQL_DB_USERNAME:$OPENSHIFT_MYSQL_DB_PASSWORD@$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/$OPENSHIFT_APP_NAME"
-  if ! ${DRUSH} site-install ${DRUPAL_PROFILE} \
+  if ! drush site-install ${DRUPAL_PROFILE} \
            --site-name=${OPENSHIFT_APP_NAME} \
            --account-pass=openshift_changeme \
            --db-url=${DB_URL} \
@@ -92,9 +89,9 @@ then
     exit 10
   fi
 
-  ${DRUSH} vset purl_base_domain ''
-  ${DRUSH} en -y os_migrate_demo
-  ${DRUSH} mi --all --user=1
+  drush vset purl_base_domain ''
+  drush en -y os_migrate_demo
+  drush mi --all --user=1
 
   #
   # Tweak settings.php to use the OpenShift environment variables instead of

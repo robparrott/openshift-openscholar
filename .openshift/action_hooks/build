@@ -6,14 +6,9 @@
 
 set -e
 
+source  ${OPENSHIFT_DATA_DIR}/.bash_profile
 # Choose version of OPenScholar to install
 OPENSCHOLAR_RELEASE=3.11.1
-
-# Explicitly point to a drush installation
-#DRUSH="${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
-DRUSH=drush
-
-export PATH=${PATH}:${OPENSHIFT_DATA_DIR}bin
 
 #
 # The PHP dir most be controlled by Drupal content
@@ -47,7 +42,7 @@ then
   echo
 
   mkdir -p ${OPENSHIFT_DATA_DIR}downloads
-  if ! ${DRUSH} dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
+  if ! drush dl drupal --destination=${OPENSHIFT_DATA_DIR}downloads --yes
   then
     echo "ERROR: Unable download and install Drupal."
     exit 7
@@ -129,7 +124,7 @@ fi
   cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
 
   if ! [ -r ./libraries/hopscotch ]; then
-    ${DRUSH} make --no-core --contrib-destination drupal-org.make .
+    drush make --no-core --contrib-destination drupal-org.make .
   fi
 
   curl -s https://getcomposer.org/installer | php
