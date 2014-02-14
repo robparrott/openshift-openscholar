@@ -107,8 +107,11 @@ then
   # Link the /openscholar-current symlink to the latest copy of the code 
   #
   rm -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
-  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep -v tgz | grep SCHOLAR | head -1)
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep -v tar.gz | grep SCHOLAR | head -1)
   export OPENSCHOLAR_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
+
+  echo "OpenScholar installed to $OPENSCHOLAR_INSTALL_DIR"
+
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
 
 
@@ -147,8 +150,6 @@ then
   # Add it into the drupal profiles
   #
   ln -s ${OPENSCHOLAR_INSTALL_DIR}/openscholar ${DRUPAL_INSTALL_DIR}/profiles/openscholar
-
-  echo "OpenScholar installed to $DRUPAL_INSTALL_DIR"
 
 else
   OPENSCHOLAR_INSTALL_DIR=$(readlink -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current)
