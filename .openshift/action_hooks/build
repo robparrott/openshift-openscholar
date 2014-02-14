@@ -75,7 +75,6 @@ else
   echo "Drupal is already installed at $DRUPAL_INSTALL_DIR"
 fi
 
-exit 0
 
 #
 # Download & Install OpenScholar
