@@ -107,7 +107,7 @@ then
   # Link the /openscholar-current symlink to the latest copy of the code 
   #
   rm -f ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
-  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep SCHOLAR | head -1)
+  LATEST=$(ls -1t ${OPENSHIFT_DATA_DIR}downloads | grep -v tgz | grep SCHOLAR | head -1)
   export OPENSCHOLAR_INSTALL_DIR="${OPENSHIFT_DATA_DIR}downloads/${LATEST}"
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
 
