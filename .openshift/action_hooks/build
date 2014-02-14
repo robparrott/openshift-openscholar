@@ -98,7 +98,7 @@ then
     cd ${OPENSHIFT_DATA_DIR}downloads
     rm -f ${TGZ}
     wget https://github.com/openscholar/openscholar/archive/${TGZ} -O ${TGZ}
-    tar xzvf ${TGZ}
+    tar xzf ${TGZ}
     cd -
    )
   fi
