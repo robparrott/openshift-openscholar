@@ -1,4 +1,5 @@
 
+
 OpenScholar on OpenShift
 ========================
 
@@ -104,14 +105,4 @@ version of Drupal from your data directory every time you push.  The
 runtime directory in your application is automatically recreated each
 push, so anything persistent must be in your Git repo or saved and
 retrieved from the data directory.
-
-
-The OpenShift `php` cartridge documentation can be found at:
-
-- https://github.com/openshift/origin-server/tree/master/cartridges/openshift-origin-cartridge-php/README.md
-
-
-The OpenShift `php` cartridge documentation can be found at:
-
-https://github.com/openshift/origin-server/tree/master/cartridges/openshift-origin-cartridge-php/README.md
 
