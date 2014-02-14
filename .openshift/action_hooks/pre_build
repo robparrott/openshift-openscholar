@@ -10,7 +10,7 @@ echo "Drupal application credentials\n\tuser: admin\n\tpassword: openshift_chang
 # Install drush outside of pear for now.
 #
 
-export PATH=${OPENSHIFT_DEPENDENCIES_DIR}/drush
+export PATH=$PATH:${OPENSHIFT_DEPENDENCIES_DIR}/drush
 
 DRUSH_URL=https://github.com/drush-ops/drush/archive/6.2.0.tar.gz 
 if [ -z $(which drush) ]; then
