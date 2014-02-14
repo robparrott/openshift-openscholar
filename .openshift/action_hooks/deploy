@@ -57,12 +57,24 @@ then
   echo
   echo "Creating a new Drupal site at ${DRUPAL_SITE_DIR}/default"
   echo
-  if ! ${DRUSH} site-install ${DRUPAL_PROFILE} --site-name=${OPENSHIFT_APP_NAME} --account-pass=openshift_changeme --db-url=mysql://$OPENSHIFT_MYSQL_DB_USERNAME:$OPENSHIFT_MYSQL_DB_PASSWORD@$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/$OPENSHIFT_APP_NAME --yes
+  DB_URL="mysql://$OPENSHIFT_MYSQL_DB_USERNAME:$OPENSHIFT_MYSQL_DB_PASSWORD@$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/$OPENSHIFT_APP_NAME"
+  if ! ${DRUSH} site-install ${DRUPAL_PROFILE} \
+           --site-name=${OPENSHIFT_APP_NAME} \
+           --account-pass=openshift_changeme \
+           --db-url=${DB_URL} \
+           --yes \
+           openscholar_flavor_form.os_profile_flavor=development \
+           openscholar_install_type.os_profile_type=vsite
+
   then
     echo "Unable to configure your Drupal installation"
     echo
     exit 10
   fi
+
+  ${DRUSH} vset purl_base_domain ''
+  ${DRUSH} en -y os_migrate_demo
+  ${DRUSH} mi --all --user=1
 
   #
   # Tweak settings.php to use the OpenShift environment variables instead of
