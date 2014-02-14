@@ -25,7 +25,7 @@ DRUSH=drush #"${OPENSHIFT_DEPENDENCIES_DIR}/drush/drush"
 PHP_INI=${OPENSHIFT_PHP_DIR}/versions/shared/configuration/etc/php.ini
 crudini --set ${PHP_INI}  PHP memory_limit 256M
 
-patch ${DRUPAL_INSTALL_DIR}/.htaccess < ${OPENSHIFT_REPO_DIR}.openshift/.htaccess.patch
+patch ${DRUPAL_INSTALL_DIR}/.htaccess < ${OPENSHIFT_REPO_DIR}.openshift/.htaccess.patch || /bin/true
 echo "php_value memory_limit 256M"       >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
 echo "php_flag apc.cache_by_default Off" >>  ${DRUPAL_INSTALL_DIR}/.htaccess 
 
