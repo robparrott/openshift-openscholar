@@ -115,6 +115,7 @@ then
   ln -s ${LATEST} ${OPENSHIFT_DATA_DIR}downloads/openscholar-current
 
 
+
   #
   # Build the OpenScholar profile
   #
@@ -125,6 +126,10 @@ then
     php composer.phar install --prefer-source
     cd ..
   )
+
+  echo
+  echo "OpenScholar successfully built in $OPENSCHOLAR_INSTALL_DIR"
+  echo 
 
   # Copy unmakable contrib files
   (
