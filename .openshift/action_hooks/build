@@ -124,9 +124,15 @@ fi
   # Build the OpenScholar profile
   #
   (
+    echo "Building OpenScholar ..."
     cd ${OPENSCHOLAR_INSTALL_DIR}/openscholar
-    ${DRUSH} make --no-core --contrib-destination drupal-org.make .
+
+    if ! [ -r ./libraries/hopscotch ]; then
+      ${DRUSH} make --no-core --contrib-destination drupal-org.make .
+    fi
+
     curl -s https://getcomposer.org/installer | php
+    rm -f composer.lock
     php composer.phar install --prefer-source
     cd ..
   )
